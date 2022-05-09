@@ -15,8 +15,8 @@ class PertestInfo():
     def __init__(self, appName, runtime, file_name):
         self.runtime = runtime  # 函数运行时长,单位：分钟
         self.alldata = [
-            ('id', 'current_time', 'CPU[%](单核)', 'battery[%]', 'temperature[℃]', 'Memory-Vss[MB]', 'Memory-Rss[MB]',
-             'Memory-Pss[MB]', 'Memory-Uss[MB]')]
+            ('id', 'current_time', 'CPU[%](单核)', 'battery[%]', 'temperature[℃]',
+             'Memory-Uss[MB]')]  # 'Memory-Vss[MB]', 'Memory-Rss[MB]','Memory-Pss[MB]',
         self.appName = appName  # 要测试的app
         self.current_time = time.strftime("%Y-%m-%d-%H-%M-%S", time.localtime())
         uuid_str = time.strftime("%Y-%m-%d-%H-%M-%S", time.localtime()) + self.appName
@@ -62,7 +62,7 @@ class PertestInfo():
                     # print("line:{}-----", line)
                     line = '#'.join(line.split())
                     print("line:{}-----XXXXX", line)
-                    cpuinfo = float(line.split("#")[-4]) / 8  # /8:单核CPU数值
+                    cpuinfo = round(float(line.split("#")[-4]) / 8, 2)  # /8:单核CPU数值
         elif self.appName == 'im.zego.GoEnjoy':
             for line in result.readlines():
                 # print("line:{}-----", line)
@@ -103,7 +103,7 @@ class PertestInfo():
                 meminfo['Vss'] = int(line.split("#")[1].rstrip('K')) / 1024  # rstrip('K'):去掉K，/1024换算成Mb
                 meminfo['Rss'] = int(line.split("#")[2].rstrip('K')) / 1024
                 meminfo['Pss'] = int(line.split("#")[3].rstrip('K')) / 1024
-                meminfo['Uss'] = int(line.split("#")[4].rstrip('K')) / 1024
+                meminfo['Uss'] = round(int(line.split("#")[4].rstrip('K')) / 1024, 2)  #round(a, 2) 将a通过round函数处理后赋值给a1，传入的2代表保留两位小数
                 # print("Uss:", meminfo['Uss'])
         # print("meminfo:", meminfo)
         return meminfo
@@ -112,7 +112,7 @@ class PertestInfo():
         # 执行获取数据函数
         now = datetime.datetime.now()
         print("now:", now)
-        Rtime = now + datetime.timedelta(seconds=self.runtime)  # 指定运行5min
+        Rtime = now + datetime.timedelta(minutes=self.runtime)  # 指定运行5min
         id = 1  # id：可以运行的次数
         while Rtime > datetime.datetime.now():
             # 指定时间跑
@@ -123,9 +123,9 @@ class PertestInfo():
             meminfo = self.get_memoryinfo()
             sleep(1)
             self.alldata.append((
-                str(id), str(now), str(CPUinfo), batterytemp['battery'], batterytemp['temperature'],
-                meminfo['Vss'],
-                meminfo['Rss'], meminfo['Pss'], meminfo['Uss']))
+                str(id), str(time.strftime("%Y-%m-%d-%H-%M-%S", time.localtime())), str(CPUinfo),
+                batterytemp['battery'], batterytemp['temperature'],
+                meminfo['Uss']))  # meminfo['Vss'],meminfo['Rss'], meminfo['Pss'],
             id = id + 1
             sleep(5)
         # 保存数据
@@ -133,6 +133,7 @@ class PertestInfo():
             writer = csv.writer(file, quoting=csv.QUOTE_ALL)
             writer.writerows(self.alldata)
             file.close()
+
 
 if __name__ == '__main__':
     redmenote7 = PertestInfo(appName='com.zego.avatartest', runtime=5, file_name="avatartest_pertest12.csv")

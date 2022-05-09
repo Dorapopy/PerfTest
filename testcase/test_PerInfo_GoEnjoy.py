@@ -8,7 +8,7 @@ import csv, os, time, pytest
 from time import sleep
 import uiautomator2 as u2
 
-from testcase.pertestinfo import PertestInfo
+from common.pertestinfo import PertestInfo
 
 
 class TestAvatarPerf():
