@@ -7,6 +7,7 @@ import datetime, time, csv
 from time import sleep
 from common.pertestinfo import PertestInfo
 
+runtage = True
 
 class ComFunc:
     def __init__(self):
@@ -24,7 +25,7 @@ class ComFunc:
         # 等待手机降温
         return sleep(10)
 
-    def com_run_perfinfo(self,runtage = True):
+    def com_run_perfinfo(self):
         # 跑全功能UI自动化时，顺便收集性能数据的运行方法
         # 执行获取数据函数
         self.runtage = runtage
@@ -35,7 +36,7 @@ class ComFunc:
         print("now:", now)
         # Rtime = now + datetime.timedelta(minutes=self.runtime)  # 指定运行5min
         id = 1  # id：可以运行的次数
-        while self.runtage:
+        while runtage:
             # 指定时间跑
             batterytemp = pertest.get_battery_temperature()  # 获取电量和电池温度
             sleep(1)

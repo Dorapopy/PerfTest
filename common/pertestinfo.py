@@ -10,6 +10,7 @@ from time import sleep
 
 # 正式可用
 
+runTag = True
 
 class PertestInfo():
     def __init__(self, appName, runtime, file_name):
@@ -128,6 +129,34 @@ class PertestInfo():
                 meminfo['Uss']))  # meminfo['Vss'],meminfo['Rss'], meminfo['Pss'],
             id = id + 1
             sleep(5)
+        # 保存数据
+        with open('../data/%s' % self.file_name, 'w', newline='') as file:
+            writer = csv.writer(file, quoting=csv.QUOTE_ALL)
+            writer.writerows(self.alldata)
+            file.close()
+
+    def com_perftest_run(self):
+        # 执行获取数据函数
+        now = datetime.datetime.now()
+        print("now:", now)
+        Rtime = now + datetime.timedelta(minutes=self.runtime)  # 指定运行5min
+        id = 1  # id：可以运行的次数
+        while runTag:
+            # 指定时间跑
+            print("在循环里。。。。。")
+            batterytemp = self.get_battery_temperature()  # 获取电量和电池温度
+            sleep(1)
+            CPUinfo = self.get_CPU_top()  # 获取app占用的CPU信息
+            sleep(1)
+            meminfo = self.get_memoryinfo()
+            sleep(1)
+            self.alldata.append((
+                str(id), str(time.strftime("%Y-%m-%d-%H-%M-%S", time.localtime())), str(CPUinfo),
+                batterytemp['battery'], batterytemp['temperature'],
+                meminfo['Uss']))  # meminfo['Vss'],meminfo['Rss'], meminfo['Pss'],
+            id = id + 1
+            sleep(5)
+        print("循环结束")
         # 保存数据
         with open('../data/%s' % self.file_name, 'w', newline='') as file:
             writer = csv.writer(file, quoting=csv.QUOTE_ALL)
